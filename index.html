@@ -717,7 +717,7 @@
                 return;
             }
             
-            currentStudent = { ssn, name: studentSnap.data().name, id: studentSnap.id };
+            currentStudent = { ssn, name: studentSnap.data().name.trim(), id: studentSnap.id };
             document.getElementById('studentName').textContent = currentStudent.name;
             document.getElementById('studentSsn').textContent = currentStudent.ssn;
             
@@ -747,6 +747,10 @@
         function displayTests() {
             const grid = document.getElementById('testsGrid');
             grid.innerHTML = '';
+            if (testsList.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #666;">لا توجد اختبارات متاحة حالياً</p>';
+                return;
+            }
             testsList.forEach(test => {
                 const card = document.createElement('div');
                 card.className = 'test-card';
@@ -872,6 +876,10 @@
                 canvas.width = canvas.offsetWidth;
                 canvas.height = 400;
                 
+                drawingContext.strokeStyle = currentColor;
+                drawingContext.lineWidth = currentLineWidth;
+                drawingContext.lineCap = 'round';
+                
                 if (studentAnswers[index]?.drawing) {
                     const img = new Image();
                     img.onload = () => drawingContext.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -916,7 +924,7 @@
                     stopDrawing();
                 });
                 
-                document.getElementById('essayText').addEventListener('input', e => saveEssayAnswer(index, e.target.value));
+                document.getElementById('essayText').addEventListener('input', e => saveEssayAnswer(index, e.target.value.trim()));
             }
             
             updateNavigationButtons();
@@ -1075,7 +1083,7 @@
                 await addDoc(collection(db, 'results'), result);
                 showCompletionSection();
             } catch (error) {
-                alert('حدث خطأ في حفظ النتيجة');
+                alert('حدث خطأ في حفظ النتيجة: ' + error.message);
             }
         }
         
