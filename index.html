@@ -717,6 +717,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHYUyj36bCFbin-10KNHv2Y9BfaQ9tooY",
+            authDomain: "exam-system-teacher-student.firebaseapp.com",
+            projectId: "exam-system-teacher-student",
+            storageBucket: "exam-system-teacher-student.firebasestorage.app",
+            messagingSenderId: "982683818654",
+            appId: "1:982683818654:web:824126e45089984152398f",
+            measurementId: "G-Q2SFE6G9RE"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+
+    
     <div class="container">
         <div class="test-header">
             <div class="header-top">
@@ -1709,5 +1729,30 @@
             }, 5000);
         }
     </script>
+        <script>
+function loginStudent() {
+    const civilId = document.getElementById("civilId").value.trim();
+
+    if (civilId === "") {
+        showAlert("الرجاء إدخال الرقم المدني", "error");
+        return;
+    }
+
+    db.collection("students").doc(civilId).get()
+    .then((doc) => {
+        if (doc.exists) {
+            window.location.href = "student-exam.html?civilId=" + civilId;
+        } else {
+            showAlert("الرقم المدني غير موجود", "error");
+        }
+    })
+    .catch((error) => {
+        console.error(error);
+        showAlert("حدث خطأ أثناء التحقق", "error");
+    });
+}
+</script>
+
 </body>
 </html>
+
