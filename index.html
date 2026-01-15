@@ -1679,77 +1679,35 @@
                 needsManualGrading: currentTest.questions.some((q, i) => q.type === 'essay' && studentAnswers[i])
             };
             
-       <script>
-function saveResults(result) {
-    const results = JSON.parse(localStorage.getItem('student_results')) || [];
-    const teacherResults = JSON.parse(localStorage.getItem('teacher_results')) || [];
-    
-    const studentResult = {
-        studentId: currentStudent.id,
-        studentSsn: currentStudent.ssn,
-        studentName: currentStudent.name,
-        testId: currentTest.id,
-        testTitle: currentTest.title,
-        testSubject: currentTest.subject,
-        score: result.score,
-        total: result.total,
-        percentage: result.percentage,
-        answers: studentAnswers,
-        totalQuestions: result.totalQuestions,
-        answeredQuestions: result.answeredQuestions,
-        startTime: new Date(Date.now() - (currentTest.duration * 60000) + (timeRemaining * 1000)).toISOString(),
-        completedAt: new Date().toISOString(),
-        duration: currentTest.duration,
-        needsManualGrading: currentTest.questions.some((q, i) => q.type === 'essay' && studentAnswers[i])
-    };
-    
-    results.push(studentResult);
-    localStorage.setItem('student_results', JSON.stringify(results));
-    
-    teacherResults.push(studentResult);
-    localStorage.setItem('teacher_results', JSON.stringify(teacherResults));
-    
-    return studentResult;
-}
-
-function restartTest() {
-    selectedTest = null;
-    currentTest = null;
-    currentQuestionIndex = 0;
-    studentAnswers = [];
-    timeRemaining = 0;
-    
-    showTestsSection();
-}
-
-function showAlert(message, type = 'info') {
-    const alertDiv = document.getElementById('alertMessage');
-    alertDiv.textContent = message;
-    alertDiv.className = `alert alert-${type}`;
-    alertDiv.style.display = 'block';
-    
-    setTimeout(() => {
-        alertDiv.style.display = 'none';
-    }, 5000);
-}
-
-const API = "https://script.google.com/macros/s/AKfycbw41IYVfRuoDXpPf4crPjWqFUp_vAQiJ5wPY5z4Ar8cF3AljMdXZ11QIkgFEd3-a6Ks/exec";
-
-function login() {
-    let civil = document.getElementById("studentSsn").value;
-
-    fetch(`${API}?action=checkStudent&civil=${civil}`)
-        .then(res => res.text())
-        .then(result => {
-            if (result === "FOUND") {
-                alert("تم التحقق، ابدأ الاختبار");
-                window.location.href = "exam.html";
-            } else {
-                alert("الرقم المدني غير موجود");
-            }
-        });
-}
-</script>
-
+            results.push(studentResult);
+            localStorage.setItem('student_results', JSON.stringify(results));
+            
+            teacherResults.push(studentResult);
+            localStorage.setItem('teacher_results', JSON.stringify(teacherResults));
+            
+            return studentResult;
+        }
+        
+        function restartTest() {
+            selectedTest = null;
+            currentTest = null;
+            currentQuestionIndex = 0;
+            studentAnswers = [];
+            timeRemaining = 0;
+            
+            showTestsSection();
+        }
+        
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.getElementById('alertMessage');
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
 </body>
 </html>
