@@ -1708,6 +1708,25 @@
                 alertDiv.style.display = 'none';
             }, 5000);
         }
-    </script>
+   
+const API = "https://script.google.com/macros/s/AKfycbw41IYVfRuoDXpPf4crPjWqFUp_vAQiJ5wPY5z4Ar8cF3AljMdXZ11QIkgFEd3-a6Ks/exec";
+
+function loginStudent() {
+    let civil = document.getElementById("civil").value;
+
+    fetch(`${API}?action=checkStudent&civil=${civil}`)
+        .then(res => res.text())
+        .then(result => {
+            if (result === "FOUND") {
+                alert("تم التحقق، ابدأ الاختبار");
+                window.location.href = "exam.html";
+            } else {
+                alert("الرقم المدني غير موجود");
+            }
+        });
+}
+</script>
+
 </body>
 </html>
+
