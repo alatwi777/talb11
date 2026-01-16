@@ -45,10 +45,6 @@
             cursor: pointer;
         }
 
-        .options input {
-            margin-left: 8px;
-        }
-
         .btn {
             padding: 12px 20px;
             background: #3498db;
@@ -57,10 +53,6 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
-        }
-
-        .btn:hover {
-            background: #2980b9;
         }
 
         #timer, #availability {
@@ -87,6 +79,13 @@
 
 <div class="container">
     <h2>الاختبار</h2>
+
+    <h3>الطالب: <span id="studentNameBox"></span></h3>
+    <h4>السجل المدني: <span id="studentCivilBox"></span></h4>
+
+    <h3 id="testTitle"></h3>
+    <h4 id="testTime"></h4>
+
     <div id="availability"></div>
     <div id="timer"></div>
 
@@ -97,15 +96,22 @@
 
 <script>
     // -----------------------------
-    // 1) بيانات الاختبار (مؤقتًا)
-    // لاحقًا ستأتي من Google Sheet عبر Apps Script
+    // 1) بيانات الطالب
     // -----------------------------
+    const studentName = localStorage.getItem("studentName");
+    const studentCivil = localStorage.getItem("studentCivil");
 
+    document.getElementById("studentNameBox").textContent = studentName || "غير معروف";
+    document.getElementById("studentCivilBox").textContent = studentCivil || "غير معروف";
+
+    // -----------------------------
+    // 2) بيانات الاختبار (مؤقتًا)
+    // -----------------------------
     const test = {
         title: "اختبار تجريبي",
-        startTime: "2026-01-16T15:00:00", // وقت البداية (UTC أو حسب ضبطك)
-        endTime:   "2026-01-16T17:00:00", // وقت النهاية
-        durationMinutes: 20, // مدة الطالب بعد بدء الاختبار
+        startTime: "2026-01-16T15:00:00",
+        endTime:   "2026-01-16T17:00:00",
+        durationMinutes: 20,
         questions: [
             {
                 id: 1,
@@ -124,20 +130,23 @@
             {
                 id: 3,
                 type: "essay_hand",
-                title: "اكتب بخط يدك تعريف الصلاة وأهميتها في حياة المسلم.",
+                title: "اكتب بخط يدك تعريف الصلاة وأهميتها.",
                 score: 10
             }
         ]
     };
 
+    document.getElementById("testTitle").textContent = test.title;
+    document.getElementById("testTime").textContent =
+        `من ${test.startTime} إلى ${test.endTime}`;
+
     let answers = {};
     let essayCanvas, essayCtx, drawing = false;
-    let timeLeft; // بالثواني
+    let timeLeft;
 
     // -----------------------------
-    // 2) التحقق من وقت الاختبار
+    // 3) التحقق من وقت الاختبار
     // -----------------------------
-
     function checkAvailability() {
         const now = new Date();
         const start = new Date(test.startTime);
@@ -166,9 +175,8 @@
     }
 
     // -----------------------------
-    // 3) عرض الأسئلة
+    // 4) عرض الأسئلة
     // -----------------------------
-
     function loadQuestions() {
         const container = document.getElementById("questionContainer");
         container.innerHTML = "";
@@ -195,7 +203,7 @@
                 html += `</div>`;
             } else if (q.type === "essay_hand") {
                 html += `
-                    <p>استخدم قلم التابلت للكتابة داخل المربع التالي:</p>
+                    <p>اكتب بخط يدك داخل المربع التالي:</p>
                     <canvas id="essayCanvas"></canvas>
                     <button type="button" class="btn" style="margin-top:10px;" onclick="clearCanvas()">مسح الكتابة</button>
                 `;
@@ -205,7 +213,6 @@
             container.innerHTML += html;
         });
 
-        // تهيئة الكانفس بعد إضافته للصفحة
         initCanvas();
     }
 
@@ -214,9 +221,8 @@
     }
 
     // -----------------------------
-    // 4) الكانفس لخط اليد
+    // 5) الكانفس للكتابة بالقلم
     // -----------------------------
-
     function initCanvas() {
         const canvas = document.getElementById("essayCanvas");
         if (!canvas) return;
@@ -230,13 +236,10 @@
         essayCtx.lineCap = "round";
         essayCtx.strokeStyle = "#000";
 
-        // دعم الماوس
         canvas.addEventListener("mousedown", startDraw);
         canvas.addEventListener("mousemove", draw);
         canvas.addEventListener("mouseup", endDraw);
-        canvas.addEventListener("mouseleave", endDraw);
 
-        // دعم اللمس
         canvas.addEventListener("touchstart", startDrawTouch, { passive: false });
         canvas.addEventListener("touchmove", drawTouch, { passive: false });
         canvas.addEventListener("touchend", endDrawTouch);
@@ -295,9 +298,8 @@
     }
 
     // -----------------------------
-    // 5) المؤقت
+    // 6) المؤقت
     // -----------------------------
-
     function startTimer() {
         const timerDiv = document.getElementById("timer");
         timeLeft = test.durationMinutes * 60;
@@ -318,11 +320,9 @@
     }
 
     // -----------------------------
-    // 6) إنهاء الاختبار
+    // 7) إنهاء الاختبار
     // -----------------------------
-
     function submitExam() {
-        // حفظ صورة الكانفس كسلسلة Base64
         if (essayCanvas) {
             const imgData = essayCanvas.toDataURL("image/png");
             const essayQuestion = test.questions.find(q => q.type === "essay_hand");
@@ -335,16 +335,14 @@
         }
 
         console.log("إجابات الطالب:", answers);
-        alert("تم إرسال إجاباتك (تجريبيًا). لاحقًا سنربطها مع Google Sheet.");
+        alert("تم إرسال إجاباتك (تجريبيًا).");
 
-        // لاحقًا:
-        // fetch(API + "?action=saveResult", { method: "POST", body: JSON.stringify({ civil, answers }) })
+        // لاحقًا سيتم إرسالها إلى Google Sheet
     }
 
     // -----------------------------
     // تشغيل الصفحة
     // -----------------------------
-
     if (checkAvailability()) {
         loadQuestions();
         startTimer();
